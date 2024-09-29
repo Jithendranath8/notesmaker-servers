@@ -1,0 +1,46 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  user_id       Int        @id @default(autoincrement())
+  username      String     @unique
+  email         String     @unique
+  password_hash String
+  created_at    DateTime   @default(now())
+  workspaces    Workspace[]
+}
+
+model Workspace {
+  workspace_id  Int        @id @default(autoincrement())
+  user_id       Int
+  title         String
+  created_at    DateTime   @default(now())
+  user          User       @relation(fields: [user_id], references: [user_id])
+  notes         Note[]
+  folders       Folder[]
+}
+
+model Note {
+  note_id       Int        @id @default(autoincrement())
+  workspace_id  Int
+  title         String
+  content       String
+  version_history Json
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+  workspace     Workspace  @relation(fields: [workspace_id], references: [workspace_id])
+}
+
+model Folder {
+  folder_id     Int        @id @default(autoincrement())
+  workspace_id  Int
+  title         String
+  created_at    DateTime   @default(now())
+  workspace     Workspace  @relation(fields: [workspace_id], references: [workspace_id])
+}
